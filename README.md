@@ -1,3 +1,0 @@
-# scrapy_coinafrique
-
-hehe
