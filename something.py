@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from urllib.request import urlopen, Request
 from lxml import etree
 import json
@@ -18,13 +16,16 @@ def process_string(string):
 
 
 def get_tree(url):
-
     hdr = {'User-Agent': 'Mozilla/5.0'}
     req = Request(url, headers=hdr)
     response = urlopen(req)
     htmlparser = etree.HTMLParser()
     tree = etree.parse(response, htmlparser)
     return tree
+
+
+def jason(url):
+    return json.loads(requests.get(url).text)
 
 list_country = []
 
@@ -38,13 +39,23 @@ for li in tree_bj.xpath('//ul/li'):
 
 dict_category = {}
 for li in tree_bj.xpath('//ul[@data-collapsible="accordion"]/li'):
-    if len(li.xpath('.//h1/text()'))>0:
+    if len(li.xpath('.//h1/text()')) > 0:
         list_id = []
         list_category = []
         for a in li.xpath('./div[@class="collection-item collapsible-body"]/a'):
             list_id.append(process_string(a.xpath('./@data-category-id')[0]))
             list_category.append(process_string(a.xpath('./@data-category-name')[0]))
-        dict_category.update({process_string(li.xpath('.//h1/text()')[0]):
-                                  dict(zip(list_id[:-1], list_category[:-1]))})
+        if not list_id:
+            dict_category.update({process_string(li.xpath('.//h1/text()')[0]):
+                                li.xpath('./div[@class="collection-item collapsible-header"]/a/@data-category-id')[0]})
+        else:
+            dict_category.update({process_string(li.xpath('.//h1/text()')[0]):
+                                dict(zip(list_id[:-1], list_category[:-1]))})
 
 print(dict_category)
+
+with open('countries.json', 'w') as outfile:
+    json.dump(list_country, outfile)
+
+with open('categories.json', 'w') as outfile:
+    json.dump(dict_category, outfile)
