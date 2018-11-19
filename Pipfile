@@ -8,6 +8,8 @@ lxml = "*"
 pandas = "*"
 Unidecode = "*"
 requests = "*"
+pymongo = "*"
+scrapy = "*"
 
 [dev-packages]
 
